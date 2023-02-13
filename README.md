@@ -10,14 +10,14 @@ If you get any problem please check the documentation
 https://python-poetry.org/docs/#installation.
 
 ### Run demo
-After doing an installation step you must follow next commands:
+After completing an installation step, you must follow next steps:
 * Change the directory to the project dir
 ```bash
 cd east_text_detector
 ```
 * Use `poetry install` to read the pyproject.toml file, resolves the dependencies, and installs them.
 ```bash
-poetry instal
+poetry install
 ```
 * Use `poetry shell` to activate virtual environment
 ```bash
