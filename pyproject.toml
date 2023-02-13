@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "east-text-detector"
+version = "0.1.0"
+description = "East text detection"
+authors = ["Podbeltsev Aleksei <Podbelcev_aleksei@mail.ru>"]
+readme = "README.md"
+packages = [{include = "east_text_detector"}]
+
+[tool.poetry.dependencies]
+python = ">=3.9,<3.12"
+imutils	= "0.5.4"
+numpy = "1.24"
+opencv-python = "4.7.0.68"
+tensorflow = "2.11.*"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
