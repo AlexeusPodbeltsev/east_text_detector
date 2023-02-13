@@ -15,9 +15,13 @@ After doing an installation step you must follow next commands:
 ```bash
 cd east_text_detector
 ```
+* Use `poetry install` to read the pyproject.toml file, resolves the dependencies, and installs them.
+```bash
+poetry instal
+```
 * Use `poetry shell` to activate virtual environment
 ```bash
-cd poetry shell
+poetry shell
 ```
 * After that change the directory to source files
 ```bash
