@@ -13,9 +13,6 @@ numpy = "<1.22,>=1.18"
 opencv-python = "4.7.0.68"
 tensorflow = "2.11.*"
 
-[tool.poetry.scripts]
-demo = 'east-text-detector:console:run'
-
 
 [build-system]
 requires = ["poetry-core"]
