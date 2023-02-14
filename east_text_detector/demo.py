@@ -1,11 +1,13 @@
 from imutils.video import VideoStream
 from imutils.video import FPS
+import os
 from imutils.object_detection import non_max_suppression
 import numpy as np
 import argparse
 import imutils
 import time
 import cv2
+
 try:
     from tflite_runtime.interpreter import Interpreter
 except:
@@ -15,38 +17,39 @@ fpsstr = ""
 framecount = 0
 time1 = 0
 
+
 def rotated_Rectangle(img, rotatedRect, color, thickness=1, lineType=cv2.LINE_8, shift=0):
     (x, y), (width, height), angle = rotatedRect
- 
+
     pt1_1 = (int(x + width / 2), int(y + height / 2))
     pt2_1 = (int(x + width / 2), int(y - height / 2))
     pt3_1 = (int(x - width / 2), int(y - height / 2))
     pt4_1 = (int(x - width / 2), int(y + height / 2))
- 
-    t = np.array([[np.cos(angle),   -np.sin(angle), x-x*np.cos(angle)+y*np.sin(angle)],
-                    [np.sin(angle), np.cos(angle),  y-x*np.sin(angle)-y*np.cos(angle)],
-                    [0,             0,              1]])
- 
+
+    t = np.array([[np.cos(angle), -np.sin(angle), x - x * np.cos(angle) + y * np.sin(angle)],
+                  [np.sin(angle), np.cos(angle), y - x * np.sin(angle) - y * np.cos(angle)],
+                  [0, 0, 1]])
+
     tmp_pt1_1 = np.array([[pt1_1[0]], [pt1_1[1]], [1]])
     tmp_pt1_2 = np.dot(t, tmp_pt1_1)
     pt1_2 = (int(tmp_pt1_2[0][0]), int(tmp_pt1_2[1][0]))
- 
+
     tmp_pt2_1 = np.array([[pt2_1[0]], [pt2_1[1]], [1]])
     tmp_pt2_2 = np.dot(t, tmp_pt2_1)
     pt2_2 = (int(tmp_pt2_2[0][0]), int(tmp_pt2_2[1][0]))
- 
+
     tmp_pt3_1 = np.array([[pt3_1[0]], [pt3_1[1]], [1]])
     tmp_pt3_2 = np.dot(t, tmp_pt3_1)
     pt3_2 = (int(tmp_pt3_2[0][0]), int(tmp_pt3_2[1][0]))
- 
+
     tmp_pt4_1 = np.array([[pt4_1[0]], [pt4_1[1]], [1]])
     tmp_pt4_2 = np.dot(t, tmp_pt4_1)
     pt4_2 = (int(tmp_pt4_2[0][0]), int(tmp_pt4_2[1][0]))
- 
+
     points = np.array([pt1_2, pt2_2, pt3_2, pt4_2])
 
     return points
- 
+
 
 def non_max_suppression(boxes, probs=None, angles=None, overlapThresh=0.3):
     # if there are no boxes, return an empty list
@@ -126,7 +129,7 @@ def decode_predictions(scores, geometry1, geometry2):
         xData2 = geometry1[0, 2, y]
         xData3 = geometry1[0, 3, y]
         anglesData = geometry2[0, 0, y]
-        
+
         # loop over the number of columns
         for x in range(0, numCols):
             # if our score does not have sufficient probability,
@@ -162,15 +165,21 @@ def decode_predictions(scores, geometry1, geometry2):
             confidences.append(scoresData[x])
             angles.append(angle)
 
-	# return a tuple of the bounding boxes and associated confidences
+    # return a tuple of the bounding boxes and associated confidences
     return (rects, confidences, angles)
 
+
 # construct the argument parser and parse the arguments
+current_dir = os.path.abspath(os.path.dirname(__file__))
 ap = argparse.ArgumentParser()
-ap.add_argument("-east", "--east", type=str, default="east_text_detection_256x256_integer_quant.tflite", help="path to input EAST text detector")
-ap.add_argument("-v", "--video", type=str, help="path to optinal input video file", default="test_video.mp4")
-ap.add_argument("-c", "--min-confidence", type=float, default=0.5, help="minimum probability required to inspect a region")
-ap.add_argument("-w", "--width", type=int, default=256,	help="resized image width (should be multiple of 32)")
+ap.add_argument("-east", "--east", type=str,
+                default=os.path.join(current_dir, "east_text_detection_256x256_integer_quant.tflite"),
+                help="path to input EAST text detector")
+ap.add_argument("-v", "--video", type=str, help="path to optinal input video file",
+                default=os.path.join(current_dir, "test_video.mp4"))
+ap.add_argument("-c", "--min-confidence", type=float, default=0.5,
+                help="minimum probability required to inspect a region")
+ap.add_argument("-w", "--width", type=int, default=256, help="resized image width (should be multiple of 32)")
 ap.add_argument("-e", "--height", type=int, default=256, help="resized image height (should be multiple of 32)")
 ap.add_argument("-cw", "--camera_width", type=int, default=640, help='USB Camera resolution (width). (Default=640)')
 ap.add_argument("-ch", "--camera_height", type=int, default=480, help='USB Camera resolution (height). (Default=480)')
@@ -265,33 +274,34 @@ while True:
         endY = int(endY * rH)
 
         # draw the bounding box on the frame
-        width   = abs(endX - startX)
-        height  = abs(endY - startY)
+        width = abs(endX - startX)
+        height = abs(endY - startY)
         centerX = int(startX + width / 2)
         centerY = int(startY + height / 2)
 
         rotatedRect = ((centerX, centerY), ((endX - startX), (endY - startY)), -angle)
         points = rotated_Rectangle(orig, rotatedRect, color=(0, 255, 0), thickness=2)
         cv2.polylines(orig, [points], isClosed=True, color=(0, 255, 0), thickness=2, lineType=cv2.LINE_8, shift=0)
-        cv2.putText(orig, fpsstr, (args["camera_width"]-170,15), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (38,0,255), 1, cv2.LINE_AA)
+        cv2.putText(orig, fpsstr, (args["camera_width"] - 170, 15), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (38, 0, 255), 1,
+                    cv2.LINE_AA)
 
     # update the FPS counter
     fps.update()
 
     # show the output frame
     cv2.imshow("Text Detection", orig)
-    if cv2.waitKey(1)&0xFF == ord('q'):
+    if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 
     # FPS calculation
     framecount += 1
     if framecount >= 10:
-        fpsstr = "(Playback) {:.1f} FPS".format(time1/10)
+        fpsstr = "(Playback) {:.1f} FPS".format(time1 / 10)
         framecount = 0
         time1 = 0
     t2 = time.perf_counter()
-    elapsedTime = t2-t1
-    time1 += 1/elapsedTime
+    elapsedTime = t2 - t1
+    time1 += 1 / elapsedTime
 
 # stop the timer and display FPS information
 fps.stop()
