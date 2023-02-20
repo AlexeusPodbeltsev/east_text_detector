@@ -36,9 +36,9 @@ python3 demo.py
 exit
 ```
 ### Build Project
-* To build a package from the code:
+* Builds the source and wheels archives:
 ```bash
-python3 –m build
+poetry build
 ```
 * To install a package directly from the repository link
 ```bash
