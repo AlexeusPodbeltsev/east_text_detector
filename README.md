@@ -35,6 +35,15 @@ python3 demo.py
 ```bash
 exit
 ```
+### Build Project
+* To build a package from the code:
+```bash
+python3 –m build
+```
+* To install a package directly from the repository link
+```bash
+pip3 install git+https://github.com/AlexeusPodbeltsev/east_text_detector.git
+```
 
 
 
