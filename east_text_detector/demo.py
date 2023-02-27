@@ -1,21 +1,21 @@
-from imutils.video import VideoStream
-from imutils.video import FPS
-import os
-from imutils.object_detection import non_max_suppression
-import numpy as np
 import argparse
-import imutils
+import os
 import time
-import cv2
 
-try:
-    from tflite_runtime.interpreter import Interpreter
-except:
-    from tensorflow.lite.python.interpreter import Interpreter
+import cv2
+import imutils
+import numpy as np
+from imutils.video import FPS, VideoStream
+from tflite_runtime.interpreter import Interpreter
+
+# try:
+# from tflite_runtime.interpreter import Interpreter
+# except:
+#     from tensorflow.lite.python.interpreter import Interpreter
 
 fpsstr = ""
 framecount = 0
-time1 = 0
+time1 = 0.0
 
 
 def rotated_Rectangle(img, rotatedRect, color, thickness=1, lineType=cv2.LINE_8, shift=0):
@@ -26,9 +26,13 @@ def rotated_Rectangle(img, rotatedRect, color, thickness=1, lineType=cv2.LINE_8,
     pt3_1 = (int(x - width / 2), int(y - height / 2))
     pt4_1 = (int(x - width / 2), int(y + height / 2))
 
-    t = np.array([[np.cos(angle), -np.sin(angle), x - x * np.cos(angle) + y * np.sin(angle)],
-                  [np.sin(angle), np.cos(angle), y - x * np.sin(angle) - y * np.cos(angle)],
-                  [0, 0, 1]])
+    t = np.array(
+        [
+            [np.cos(angle), -np.sin(angle), x - x * np.cos(angle) + y * np.sin(angle)],
+            [np.sin(angle), np.cos(angle), y - x * np.sin(angle) - y * np.cos(angle)],
+            [0, 0, 1],
+        ]
+    )
 
     tmp_pt1_1 = np.array([[pt1_1[0]], [pt1_1[1]], [1]])
     tmp_pt1_2 = np.dot(t, tmp_pt1_1)
@@ -89,7 +93,8 @@ def non_max_suppression(boxes, probs=None, angles=None, overlapThresh=0.3):
         i = idxs[last]
         pick.append(i)
 
-        # find the largest (x, y) coordinates for the start of the bounding box and the smallest (x, y) coordinates for the end of the bounding box
+        # find the largest (x, y) coordinates for the start of the bounding box
+        # and the smallest (x, y) coordinates for the end of the bounding box
         xx1 = np.maximum(x1[i], x1[idxs[:last]])
         yy1 = np.maximum(y1[i], y1[idxs[:last]])
         xx2 = np.minimum(x2[i], x2[idxs[:last]])
@@ -172,17 +177,55 @@ def decode_predictions(scores, geometry1, geometry2):
 # construct the argument parser and parse the arguments
 current_dir = os.path.abspath(os.path.dirname(__file__))
 ap = argparse.ArgumentParser()
-ap.add_argument("-east", "--east", type=str,
-                default=os.path.join(current_dir, "east_text_detection_256x256_integer_quant.tflite"),
-                help="path to input EAST text detector")
-ap.add_argument("-v", "--video", type=str, help="path to optinal input video file",
-                default=os.path.join(current_dir, "test_video.mp4"))
-ap.add_argument("-c", "--min-confidence", type=float, default=0.5,
-                help="minimum probability required to inspect a region")
-ap.add_argument("-w", "--width", type=int, default=256, help="resized image width (should be multiple of 32)")
-ap.add_argument("-e", "--height", type=int, default=256, help="resized image height (should be multiple of 32)")
-ap.add_argument("-cw", "--camera_width", type=int, default=640, help='USB Camera resolution (width). (Default=640)')
-ap.add_argument("-ch", "--camera_height", type=int, default=480, help='USB Camera resolution (height). (Default=480)')
+ap.add_argument(
+    "-east",
+    "--east",
+    type=str,
+    default=os.path.join(current_dir, "east_text_detection_256x256_integer_quant.tflite"),
+    help="path to input EAST text detector",
+)
+ap.add_argument(
+    "-v",
+    "--video",
+    type=str,
+    help="path to optinal input video file",
+    default=os.path.join(current_dir, "test_video.mp4"),
+)
+ap.add_argument(
+    "-c",
+    "--min-confidence",
+    type=float,
+    default=0.5,
+    help="minimum probability required to inspect a region",
+)
+ap.add_argument(
+    "-w",
+    "--width",
+    type=int,
+    default=256,
+    help="resized image width (should be multiple of 32)",
+)
+ap.add_argument(
+    "-e",
+    "--height",
+    type=int,
+    default=256,
+    help="resized image height (should be multiple of 32)",
+)
+ap.add_argument(
+    "-cw",
+    "--camera_width",
+    type=int,
+    default=640,
+    help="USB Camera resolution (width). (Default=640)",
+)
+ap.add_argument(
+    "-ch",
+    "--camera_height",
+    type=int,
+    default=480,
+    help="USB Camera resolution (height). (Default=480)",
+)
 args = vars(ap.parse_args())
 
 # initialize the original frame dimensions, new frame dimensions,
@@ -250,12 +293,12 @@ while True:
     frame -= mean
     frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
     frame = np.expand_dims(frame, axis=0)
-    interpreter.set_tensor(input_details[0]['index'], frame)
+    interpreter.set_tensor(input_details[0]["index"], frame)
     interpreter.invoke()
 
-    scores = interpreter.get_tensor(output_details[0]['index'])
-    geometry1 = interpreter.get_tensor(output_details[1]['index'])
-    geometry2 = interpreter.get_tensor(output_details[2]['index'])
+    scores = interpreter.get_tensor(output_details[0]["index"])
+    geometry1 = interpreter.get_tensor(output_details[1]["index"])
+    geometry2 = interpreter.get_tensor(output_details[2]["index"])
     scores = np.transpose(scores, [0, 3, 1, 2])
     geometry1 = np.transpose(geometry1, [0, 3, 1, 2])
     geometry2 = np.transpose(geometry2, [0, 3, 1, 2])
@@ -281,16 +324,32 @@ while True:
 
         rotatedRect = ((centerX, centerY), ((endX - startX), (endY - startY)), -angle)
         points = rotated_Rectangle(orig, rotatedRect, color=(0, 255, 0), thickness=2)
-        cv2.polylines(orig, [points], isClosed=True, color=(0, 255, 0), thickness=2, lineType=cv2.LINE_8, shift=0)
-        cv2.putText(orig, fpsstr, (args["camera_width"] - 170, 15), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (38, 0, 255), 1,
-                    cv2.LINE_AA)
+        cv2.polylines(
+            orig,
+            [points],
+            isClosed=True,
+            color=(0, 255, 0),
+            thickness=2,
+            lineType=cv2.LINE_8,
+            shift=0,
+        )
+        cv2.putText(
+            orig,
+            fpsstr,
+            (args["camera_width"] - 170, 15),
+            cv2.FONT_HERSHEY_SIMPLEX,
+            0.5,
+            (38, 0, 255),
+            1,
+            cv2.LINE_AA,
+        )
 
     # update the FPS counter
     fps.update()
 
     # show the output frame
     cv2.imshow("Text Detection", orig)
-    if cv2.waitKey(1) & 0xFF == ord('q'):
+    if cv2.waitKey(1) & 0xFF == ord("q"):
         break
 
     # FPS calculation
