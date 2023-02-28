@@ -52,9 +52,20 @@ python3 demo.py
 exit
 ```
 
+* If you want to add new dependency to the project, you can simply write next command:
+```bash
+poetry add <dependency_name>
+```
+Or you can add it directly in pyproject.toml file, but after that you have to run this command
+to fetch the latest matching versions (according to your pyproject.toml file) and update the lock file with the new versions. 
+```bash 
+poetry update
+```
+
 * If you want to directly run program using command line, you can use next command:
 ```bash
 poetry run demo
+```
 
 ### Build Project
 
