@@ -35,6 +35,10 @@ python3 demo.py
 ```bash
 exit
 ```
+* If you want to directly run program with command line, you can use next command:
+```bash
+poetry run demo
+```
 ### Build Project
 * Builds the source and wheels archives:
 ```bash
