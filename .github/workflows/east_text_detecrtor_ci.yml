@@ -42,4 +42,7 @@ jobs:
         black .
     - name: Test with pytest
       run: |
-        pytest
+        poetry run pytest
+    - name: Build Package
+      run: |
+        poetry build
