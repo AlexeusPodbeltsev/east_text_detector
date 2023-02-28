@@ -1,4 +1,3 @@
-import argparse
 import os
 import time
 
@@ -7,10 +6,6 @@ import imutils
 import numpy as np
 from imutils.video import FPS, VideoStream
 from tensorflow.lite.python.interpreter import Interpreter
-
-# try:
-#     from tflite_runtime.interpreter import Interpreter
-# except:
 
 fpsstr = ""
 framecount = 0
