@@ -1,0 +1,48 @@
+# This workflow will install Python dependencies, run tests and lint with a single version of Python
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
+
+name: East text detecrtor ci
+
+on:
+  push:
+    branches: [ "master", "week1_assignment", "week2_assignment" ]
+  pull_request:
+    branches: [ "master", "week1_assignment", "week2_assignment" ]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v3
+      with:
+        python-version: "3.9"
+        
+    - name: Install Poetry
+      uses: dschep/install-poetry-action@v1.2
+    
+    - name: Install dependencies
+      run: |
+        poetry install
+        pip3 install Flake8-pyproject
+        pip3 install black
+        
+    
+    - name: Lint with flake8
+      run: |
+        flake8 .
+    - name: Lint with balck
+      run: |
+        black .
+    - name: Test with pytest
+      run: |
+        poetry run pytest
+    - name: Build Package
+      run: |
+        poetry build
