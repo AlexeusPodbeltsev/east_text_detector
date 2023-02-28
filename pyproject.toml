@@ -4,14 +4,46 @@ version = "0.1.0"
 description = "East text detection"
 authors = ["Podbeltsev Aleksei <Podbelcev_aleksei@mail.ru>"]
 readme = "README.md"
-packages = [{include = "east_text_detector"}]
+packages = [{ include = "east_text_detector" }]
+
+[tool.black]
+line-length = 120
+target-version = ['py37', 'py38']
+include = '\.pyi?$'
+exclude = '''
+    /(
+     \.eggs
+    | \.git
+    | \.hg
+    | \.mypy_cache
+    | \.nox
+    | \.tox
+    | \.venv
+    | _build|buck-out
+    | build|dist
+    )/
+'''
+
+
+
+[tool.flake8]
+ignore = ['I101', 'I201', 'F401', 'F403', 'S001', 'D100', 'D101', 'D102', 'D103', 'D104', 'D105', 'D106', 'D107', 'D200', 'D205', 'D400', 'W504', 'D202', 'E203', 'E722', 'W503', 'B006']
+exclude = ['.tox', '__pycache__', '.git', 'build', 'dist', '.venv', '.tfile', '.mp4']
+max-line-length = 120
+count = true
 
 [tool.poetry.dependencies]
-python = ">=3.9,<3.11"
-imutils	= "0.5.4"
+python = ">=3.8,<3.11"
+imutils = "0.5.4"
 numpy = "<1.22,>=1.18"
 opencv-python = "4.7.0.68"
 tensorflow = "2.11.*"
+pytest = "~6.0.0"
+
+[tool.poetry.group.test.dependencies]
+pytest = "^6.0.0"
+pytest-mock = "*"
+numpy = "<1.22,>=1.18"
 
 [tool.poetry.scripts]
 demo = 'east_text_detector.demo:main'
