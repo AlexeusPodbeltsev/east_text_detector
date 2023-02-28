@@ -55,6 +55,7 @@ exit
 * If you want to directly run program using command line, you can use next command:
 ```bash
 poetry run demo
+```
 
 ### Build Project
 
