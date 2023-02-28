@@ -30,7 +30,7 @@ jobs:
     
     - name: Install dependencies
       run: |
-        poetry install
+        poetry update
         pip3 install Flake8-pyproject
         pip3 install black
         
