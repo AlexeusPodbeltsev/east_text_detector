@@ -32,6 +32,7 @@ jobs:
         poetry install
         pip3 install Flake8-pyproject
         pip3 install black
+        
     
     - name: Lint with flake8
       run: |
@@ -41,4 +42,8 @@ jobs:
         black .
     - name: Test with pytest
       run: |
-        pytest
+        poetry run pytest
+    - name: Build Package
+      run: |
+        poetry build
+        
