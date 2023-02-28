@@ -99,3 +99,6 @@ pip3 install pre-commit
 pre-commit run -a 
 ```
 * After all checks were passed, you can commit new changes.
+
+## Setup CI pipeline
+
