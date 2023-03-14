@@ -191,8 +191,11 @@ input_details = interpreter.get_input_details()
 output_details = interpreter.get_output_details()
 
 
-def detect_text_on_image(image):
-    img = cv2.imread(image)
+def detect_text_on_image(image, filepath=False):
+    if filepath:
+        img = cv2.imread(image)
+    else:
+        img = cv2.imdecode(image, 1)
     img = imutils.resize(img, width=640)
     orig = img.copy()
     (H, W) = img.shape[:2]
@@ -259,14 +262,14 @@ def detect_text_on_image(image):
     # # show the output frame
     # cv2.imshow("Text Detection", orig)
     # cv2.waitKey(0)
-    return rects
+    return rects, orig
 
 
-def detect_text_on_video():
+def detect_text_on_video(path=os.path.join(current_dir, "test_video.mp4")):
     global fps, frame, H, W, rW, rH, angle, width, height, points, fpsstr, framecount, time1
     # if a video path was not supplied, grab the reference to the web cam
 
-    vs = cv2.VideoCapture(os.path.join(current_dir, "test_video.mp4"))
+    vs = cv2.VideoCapture(path)
     # start the FPS throughput estimator
     fps = FPS().start()
     # loop over frames from the video stream
