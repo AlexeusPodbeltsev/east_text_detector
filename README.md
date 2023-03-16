@@ -115,5 +115,15 @@ pre-commit run -a
 ```
 * After all checks were passed, you can commit new changes.
 
-## Setup CI pipeline
+## Build Docker Image
+
+* To build a Docker image you must run next command:
+```bash
+docker build -t east_text_detector .
+```
+* After build is complete,  you can simply run:
+```bash
+docker run -p 8501:8501 east_text_detector:latest
+```
+
 
